@@ -1,8 +1,5 @@
-This is a template repo. To start.
 
-search `{moduleName}` through the project and replace it with the module identifier (ex: `socials` for `hugo-module-tnd-socials`)
-
-# {moduleName} Hugo Module
+# TND Scripts Hugo Module
 
 (intro)
 
@@ -27,33 +24,64 @@ Configure your project's module to import this module:
 # config.yaml
 module:
   imports:
-  - path: github.com/theNewDynamic/hugo-module-tnd-{moduleName}
+  - path: github.com/theNewDynamic/hugo-module-tnd-scripts
 ```
 
 ## Usage
 
-### Some Partial/Feature
+### Registered scripts.
+Without any configuration, the Module will consider `/assets/js/index.js` a registered script of name `main`.
+In order to add more registrered scripts, user should reference them under the `scripts` key of the module configuration with the following keys:
+__name__: The name of the script. Will be use to call it through the `tnd-scripts/tags` partial`
+__path__: The `path` relative to the project's assets directory.
+__params__: A set of keys/value paris which will be passed to the script and available from it using the `import { params } from '@params'` statement.
+```
+tnd_scripts:
+  scripts:
+    - name: main
+      path: /js/index.js
+    - name: carousel
+      path: /js/carousel.jsx
+      params:
+        slides: [...]
+```
+
+### tnd-scripts/tags
+
+By calling the `tnd-scripts/tags` partial, the module will print a `<script>` tag for each registered scripts.
+If the context is a slice of strings, only the registered scripts whose name is included will be called:
 
 #### Examples
 
-### Settings
+##### Call all scripts
+```
+<head>
+{{ partial "tnd-scripts/tags" "anything" }}
+</head>
+```
+Will print:
 
-Settings are added to the project's parameter under the `tnd_{moduleName}` map as shown below.
-
-```yaml
-# config.yaml
-params:
-  tnd_{moduleName}:
-    [...]
+```html
+<head>
+  <script crossorigin="anonymous" defer="defer" src="/js/index.js" type="text/javascript"></script>
+  <script crossorigin="anonymous" defer="defer" src="/js/carousel.js" type="text/javascript"></script>
+</head>
 ```
 
-#### Configure Key 1
+###### Call selected scripts
 
-#### Configure Key 2
+```
+<head>
+{{ partial "tnd-scripts/tags" (slice "carousel") }}
+</head>
+```
+Will print:
 
-#### Defaults
-
-ld copy/paste the above to your settings and append with new extensions.
+```html
+<head>
+  <script crossorigin="anonymous" defer="defer" src="/js/carousel.js" type="text/javascript"></script>
+</head>
+```
 
 ## theNewDynamic
 

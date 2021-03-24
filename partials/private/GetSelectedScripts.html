@@ -1,0 +1,14 @@
+{{ $scripts := partialCached "tnd-scripts/private/GetScriptAssets" "GetScriptAssets" }}
+{{ $selected := $scripts }}
+{{ if reflect.IsSlice $ }}
+  {{ $selected = slice }}
+  {{ range $name := $ }}
+    {{ with where $scripts ".name" . }}
+      {{ with index . 0 }}
+        {{ $selected = $selected | append . }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ return $selected }}

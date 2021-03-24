@@ -1,0 +1,48 @@
+{{/*
+  GetScriptAssets
+  Retrieves the list of registered assets and process them.
+
+  @author @regisphilibert
+
+  @context String | Slice of strings (.)
+
+  @access private
+
+  @returns Slice of maps
+    - String (.name)
+      Resource (.asset)
+
+
+  @uses
+     - tnd-scripts/private/GetConfig
+     - tnd-scripts/private/GetProcessedAsset
+*/}}
+{{ $return := slice }}
+
+{{ $registered_scripts := slice (dict "name" "main" "path" "/js/index.*") }}
+{{ $config := partialCached "tnd-scripts/private/GetConfig" . "GetConfig" }}
+{{ with $config.scripts }}
+  {{ $registered_scripts = . }}
+{{ end }}
+
+{{ range $script := $registered_scripts }}
+  {{ with $path := .path }}
+
+    {{ $name := $path }}
+    {{ with $script.name }}
+      {{ $name = . }}
+    {{ end }}
+
+    {{ $params := dict }}
+
+    {{ with resources.GetMatch $path }}
+      {{ with partialCached "tnd-scripts/private/GetProcessedAsset" (dict "Resource" . "info" $script) $script }}
+        {{ $return = $return | append (dict "name" $name "asset" .) }}
+      {{ end }}
+    {{ else }}
+      {{ partial "tnd-scripts/warn" (printf "Resource not found for script '%s' at %s" $name $path) }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ return $return }}

@@ -1,0 +1,53 @@
+
+{{/*
+  GetProcessedAsset
+  Process a given Resource following module's logic
+
+  @author @regisphilibert
+
+  @context Map (.)
+    Resource (.Resource)
+    Map (.info)
+      String (.name)
+      String (.path)
+      Map (.params)
+
+  @access private
+
+  @returns Resource
+
+  @uses
+     - partial
+
+  @example - Go Template
+    {{ with partialCached "GetProcessedAsset" context context }}
+      {{ something = . }}
+    {{ end }}
+*/}}
+{{ $asset := dict }}
+
+{{ $target := "es2015" }}
+
+{{ $params := dict }}
+{{ with .info.params }}
+  {{ $params = dict "params" . }}
+{{ end }}
+
+{{ $env := "development" }}
+{{ $not_dev := ne (getenv "HUGO_ENV") "development" }}
+{{ $not_server := not site.IsServer }}
+{{ if and $not_dev $not_server }}
+  {{ $env = "production" }}
+{{ end }}
+
+{{ $defines := dict "process.env.NODE_ENV" (printf `"%s"` $env) }}
+
+{{ $options := dict "target" $target "defines" $defines "params" $params "sourceMap" "inline" }}
+{{ if eq $env "production" }}
+  {{ $options = merge $options (dict "minify" true) }}
+  {{ $asset = .Resource | js.Build $options | fingerprint }}
+{{ else }}
+  {{ $asset = .Resource | js.Build $options }}
+{{ end }}
+
+{{ return $asset }}

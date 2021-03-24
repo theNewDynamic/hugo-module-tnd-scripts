@@ -1,0 +1,23 @@
+{{/*
+  tags.html
+  Prints all the necessary tags for scripts
+
+  @author @regisphilibert
+
+  @context Any (.)
+
+  @access public
+
+  @example - Go Template
+    <head>
+      [...]
+      {{ partialCached "tnd-scripts/tags.html" . }}
+      [...]
+    </head>
+*/}}
+{{ range partialCached "tnd-scripts/private/GetSelectedScripts" $ $ }}
+    {{ with .asset }}
+      {{ $tag := dict "name" "script" "attr" (dict "type" "text/javascript" "src" .RelPermalink "crossorigin" "anonymous" "defer" "defer") }}
+      {{ partialCached "tnd-tags/tag" $tag $tag }}
+    {{ end }}
+{{ end }}
