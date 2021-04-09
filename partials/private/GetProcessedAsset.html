@@ -39,10 +39,15 @@
 {{ if and $not_dev $not_server }}
   {{ $env = "production" }}
 {{ end }}
-
 {{ $defines := dict "process.env.NODE_ENV" (printf `"%s"` $env) }}
 
-{{ $options := dict "target" $target "defines" $defines "params" $params "sourceMap" "inline" }}
+{{/* Use can choose a format through script setting */}}
+{{ $format := "iife" }}
+{{ if .info.format }}
+  {{ $format = "cjs" }}
+{{ end }}
+
+{{ $options := dict "target" $target "defines" $defines "format" $format "params" $params "sourceMap" "inline" }}
 {{ if eq $env "production" }}
   {{ $options = merge $options (dict "minify" true) }}
   {{ $asset = .Resource | js.Build $options | fingerprint }}

@@ -15,9 +15,15 @@
       [...]
     </head>
 */}}
-{{ range partialCached "tnd-scripts/private/GetSelectedScripts" $ $ }}
-    {{ with .asset }}
-      {{ $tag := dict "name" "script" "attr" (dict "type" "text/javascript" "src" .RelPermalink "crossorigin" "anonymous" "defer" "defer") }}
+{{ range $script := partialCached "tnd-scripts/private/GetSelectedScripts" $ $ }}
+    {{ with $asset := .asset }}
+      {{/* We init the $tag assuming inline is true so .RelPermalink is not invoked and resource is not published */}}
+      {{ $tag := dict "name" "script" "inner" .Content }}
+      {{/* If inline is false, then we need an external request */}}
+      {{ if not $script.inline }}
+        {{ $tag = dict "name" "script" "attr" (dict "type" "text/javascript" "src" .RelPermalink "crossorigin" "anonymous" "defer" "defer") }}
+      {{ end }}
       {{ partialCached "tnd-tags/tag" $tag $tag }}
     {{ end }}
+   
 {{ end }}

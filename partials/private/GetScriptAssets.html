@@ -28,16 +28,21 @@
 {{ range $script := $registered_scripts }}
   {{ with $path := .path }}
 
+    {{/* If a name is omitted, we'll use the path */}}
     {{ $name := $path }}
     {{ with $script.name }}
       {{ $name = . }}
     {{ end }}
 
-    {{ $params := dict }}
+    {{/* Some script can be printed on the page rather than called through a request */}}
+    {{ $inline := false }}
+    {{ with $script.inline }}
+      {{ $inline = . }}
+    {{ end }}
 
     {{ with resources.GetMatch $path }}
       {{ with partialCached "tnd-scripts/private/GetProcessedAsset" (dict "Resource" . "info" $script) $script }}
-        {{ $return = $return | append (dict "name" $name "asset" .) }}
+        {{ $return = $return | append (dict "name" $name "inline" $inline "asset" .) }}
       {{ end }}
     {{ else }}
       {{ partial "tnd-scripts/warn" (printf "Resource not found for script '%s' at %s" $name $path) }}
