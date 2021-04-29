@@ -1,0 +1,23 @@
+{{ $s := newScratch }}
+{{ $s.Set "defines" dict }}
+
+{{ $env := "development" }}
+{{ $not_dev := ne (getenv "HUGO_ENV") "development" }}
+{{ $not_server := not site.IsServer }}
+{{ if and $not_dev $not_server }}
+  {{ $env = "production" }}
+{{ end }}
+{{ $s.SetInMap "defines" "process.env.NODE_ENV" (printf `"%s"` $env) }}
+
+{{ $config := partialCached "tnd-scripts/private/GetConfig" "GetConfig" }}
+{{ with $config.env }}
+  {{ range $var := . }}
+    {{ with getenv . }}
+      {{ $key := print "process.env." $var }}
+      {{ $value := printf `"%s"` . }}
+      {{ $s.SetInMap "defines" $key $value }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ return $s.Get "defines" }}

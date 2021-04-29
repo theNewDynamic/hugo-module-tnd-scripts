@@ -32,14 +32,14 @@
 {{ with .info.params }}
   {{ $params = dict "params" . }}
 {{ end }}
-
 {{ $env := "development" }}
 {{ $not_dev := ne (getenv "HUGO_ENV") "development" }}
 {{ $not_server := not site.IsServer }}
 {{ if and $not_dev $not_server }}
   {{ $env = "production" }}
 {{ end }}
-{{ $defines := dict "process.env.NODE_ENV" (printf `"%s"` $env) }}
+
+{{ $defines := partialCached "tnd-scripts/private/GetDefines" "GetDefines" }}
 
 {{/* Use can choose a format through script setting */}}
 {{ $format := "iife" }}
