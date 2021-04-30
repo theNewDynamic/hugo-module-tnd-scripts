@@ -83,6 +83,35 @@ Will print:
 </head>
 ```
 
+## Global Settings
+
+### env_keys
+
+The module takes a list of environment variable keys to be replaced by their found value.
+
+```yaml
+params:
+  tnd_scripts:
+    env_keys:
+      - API_KEY
+      - SERVICE_URL
+      ...
+```
+
+In order for your scripts to proper define variables when bundling, the module needs to know the list of environment variable keys which need to be fetched and properly replaced so that
+
+```js
+let public_api_key = process.env.API_KEY
+let endpoint = process.env.SERVICE_URL
+```
+
+be processed as
+
+```js
+let public_api_key = "the_value_of_API_KEY"
+let endpoint = "the_value_of_SERVICE_URL"
+```
+
 ## theNewDynamic
 
 This project is maintained and loved by [thenewDynamic](https://www.thenewdynamic.com).

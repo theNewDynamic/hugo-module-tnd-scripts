@@ -1,22 +1,48 @@
+{{/*
+  GetDefines
+  Retrieves the list of defines to be passed to js.Build
+
+  @author @regisphilibert
+
+  @context Any (.)
+
+  @access private
+
+  @returns Map
+
+  @uses
+     - tnd-scripts/GetConfig
+
+*/}}
 {{ $s := newScratch }}
 {{ $s.Set "defines" dict }}
 
-{{ $env := "development" }}
-{{ $not_dev := ne (getenv "HUGO_ENV") "development" }}
-{{ $not_server := not site.IsServer }}
-{{ if and $not_dev $not_server }}
-  {{ $env = "production" }}
-{{ end }}
-{{ $s.SetInMap "defines" "process.env.NODE_ENV" (printf `"%s"` $env) }}
+{{/* $env is set using Hugo's own logic */}}
+{{ $env := hugo.Environment }}
 
+{{/* We overwrite $env if HUGO_ENV is found */}}
+{{ with getenv "HUGO_ENV" }}
+  {{ $env = . }}
+{{ end }}
+
+{{/* We make NODE_ENV consistent with HUGO_ENV */}}
+{{ range slice "HUGO_ENV" "NODE_ENV" }}
+  {{ $s.SetInMap "defines" (printf "process.env.%s" .) (printf `"%s"` $env) }}
+{{ end }}
+
+{{/* Next we try and retrieve keys passed to tnd_scripts.env_keys */}}
 {{ $config := partialCached "tnd-scripts/private/GetConfig" "GetConfig" }}
-{{ with $config.env }}
-  {{ range $var := . }}
-    {{ with getenv . }}
-      {{ $key := print "process.env." $var }}
-      {{ $value := printf `"%s"` . }}
-      {{ $s.SetInMap "defines" $key $value }}
+{{ with $config.env_keys }}
+  {{ if reflect.IsSlice . }}
+    {{ range $var := . }}
+      {{ with getenv . }}
+        {{ $key := print "process.env." $var }}
+        {{ $value := printf `"%s"` . }}
+        {{ $s.SetInMap "defines" $key $value }}
+      {{ end }}
     {{ end }}
+  {{ else }}
+    {{ partial "tnd-scripts/warn" "The `env_keys` should be a slice." }}
   {{ end }}
 {{ end }}
 
