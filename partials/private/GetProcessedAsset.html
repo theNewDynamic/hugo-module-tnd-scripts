@@ -32,11 +32,11 @@
 {{ with .info.params }}
   {{ $params = dict "params" . }}
 {{ end }}
-{{ $env := "development" }}
+{{ $minify := false }}
 {{ $not_dev := ne (getenv "HUGO_ENV") "development" }}
 {{ $not_server := not site.IsServer }}
 {{ if and $not_dev $not_server }}
-  {{ $env = "production" }}
+  {{ $minify = true }}
 {{ end }}
 
 {{ $defines := partialCached "tnd-scripts/private/GetDefines" "GetDefines" }}
@@ -47,8 +47,14 @@
   {{ $format = "cjs" }}
 {{ end }}
 
+{{/* We don't want to minify an inline script as function renaming might break script for functions
+invoked elsewhere  */}}
+{{ if .info.inline }}
+  {{ $minify = false }}
+{{ end }}
+
 {{ $options := dict "target" $target "defines" $defines "format" $format "params" $params "sourceMap" "inline" }}
-{{ if eq $env "production" }}
+{{ if $minify }}
   {{ $options = merge $options (dict "minify" true) }}
   {{ $asset = .Resource | js.Build $options | fingerprint }}
 {{ else }}
