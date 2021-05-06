@@ -6,3 +6,5 @@ module:
     target: layouts/partials/tnd-scripts
   - source: console
     target: layouts/partials/tnd-scripts
+  imports:
+  - path: github.com/theNewDynamic/hugo-module-tnd-tags
