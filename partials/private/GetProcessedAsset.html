@@ -33,7 +33,7 @@
   {{ $params = dict "params" . }}
 {{ end }}
 {{ $minify := false }}
-{{ $not_dev := ne (getenv "HUGO_ENV") "development" }}
+{{ $not_dev := partialCached "tnd-env/IsNot" "development" "development" }}
 {{ $not_server := not site.IsServer }}
 {{ if and $not_dev $not_server }}
   {{ $minify = true }}
