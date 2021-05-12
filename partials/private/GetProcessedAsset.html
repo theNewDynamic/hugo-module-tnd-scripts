@@ -53,11 +53,13 @@ invoked elsewhere  */}}
   {{ $minify = false }}
 {{ end }}
 
-{{ $options := dict "target" $target "defines" $defines "format" $format "params" $params "sourceMap" "inline" }}
+{{ $options := dict "target" $target "defines" $defines "format" $format "params" $params }}
 {{ if $minify }}
   {{ $options = merge $options (dict "minify" true) }}
   {{ $asset = .Resource | js.Build $options | fingerprint }}
 {{ else }}
+  {{/* We add a sourceMap only on dev mode */}}
+  {{ $options = merge $options (dict "sourceMap" "inline") }}
   {{ $asset = .Resource | js.Build $options }}
 {{ end }}
 
