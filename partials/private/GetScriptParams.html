@@ -1,0 +1,44 @@
+{{/*
+  GetScriptParams
+  Retrieves the scrips passed params either as settings or a returning partials
+
+  @author @regisphilibert
+
+  @context Anu (.)
+
+  @access private
+
+  @returns Map
+
+  @uses
+     - partial
+
+*/}}
+{{ $params := dict }}
+{{ with $input := .params }}
+  {{/* We check if the value is a string */}}
+  {{ if eq (printf "%#T" .) "string" }}
+    {{/* Subsequent lines check if it matches the following pattern and retrieves it's captured string as the partial's name */}}
+    {{ $pattern := "^partial ([.0-9a-zA-Z/_-]*)$" }}
+    {{ with findRE $pattern . }}
+      {{ with replaceRE $pattern "$1" $input }}
+        {{/* If the partial exists, we use what it returns to populate the script's params */}}
+        {{ if templates.Exists (printf "partials/%s.html" .) }}
+          {{ $params = partial . . }}
+        {{ else }}
+          {{/* Else we notify the user the passed partial does not exist */}}
+          {{ partial "tnd-scripts/warn" (
+            printf 
+              "You're trying to use a partial (%s) to define '%s' script params but it does not exist"
+              $input $.name
+          ) }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  {{ else }}
+    {{/* Params is not a string, therefor not a partial, we pass it as is. */}}
+    {{ $params = . }}
+  {{ end }}
+{{ end }}
+
+{{ return $params }}
