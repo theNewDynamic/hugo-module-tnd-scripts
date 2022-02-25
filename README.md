@@ -34,6 +34,8 @@ Without any configuration, the Module will consider `/assets/js/index.js` a regi
 In order to add more registrered scripts, user should reference them under the `scripts` key of the module configuration with the following keys:
 __name__: The name of the script. Will be use to call it through the `tnd-scripts/tags` partial`
 __path__: The `path` relative to the project's assets directory.
+__target__: The `target`environment for the generated script. Defaults to `es2015`
+__format__: The output `format`for the generated script. Either `iief` (immediately-invoked function expression), `csj` for CommonJS or `esm` for ECMAScript module. Defaults to `iief`.
 __params__: Params will be passed to the script and available from it using the `import { params } from '@params'` statement.
 Params can either be set of keys/value pairs or a string pointing to a returning partial and formated as such: `partial func/GetScriptParams`.
 
