@@ -28,8 +28,8 @@
 
 {{ $target := "es2015" }}
 
-{{ $params := dict }}
-{{ with .info.params }}
+{{ $params := dict "params" dict }}
+{{ with partialCached "tnd-scripts/private/GetScriptParams" .info .info }}
   {{ $params = dict "params" . }}
 {{ end }}
 {{ $minify := false }}
