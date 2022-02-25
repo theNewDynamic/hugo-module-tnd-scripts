@@ -34,7 +34,9 @@ Without any configuration, the Module will consider `/assets/js/index.js` a regi
 In order to add more registrered scripts, user should reference them under the `scripts` key of the module configuration with the following keys:
 __name__: The name of the script. Will be use to call it through the `tnd-scripts/tags` partial`
 __path__: The `path` relative to the project's assets directory.
-__params__: A set of keys/value paris which will be passed to the script and available from it using the `import { params } from '@params'` statement.
+__params__: Params will be passed to the script and available from it using the `import { params } from '@params'` statement.
+Params can either be set of keys/value pairs or a string pointing to a returning partial and formated as such: `partial func/GetScriptParams`.
+
 ```
 tnd_scripts:
   scripts:
@@ -44,6 +46,9 @@ tnd_scripts:
       path: /js/carousel.jsx
       params:
         slides: [...]
+    - name: shop
+      path: /js/shop.jsx
+      params: partial GetShopScriptData
 ```
 
 ### tnd-scripts/tags
