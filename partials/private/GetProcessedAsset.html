@@ -26,8 +26,6 @@
 */}}
 {{ $asset := dict }}
 
-{{ $target := "es2015" }}
-
 {{ $params := dict "params" dict }}
 {{ with partialCached "tnd-scripts/private/GetScriptParams" .info .info }}
   {{ $params = dict "params" . }}
@@ -41,11 +39,20 @@
 
 {{ $defines := partialCached "tnd-scripts/private/GetDefines" "GetDefines" }}
 
+{{/* Use can choose a target through script setting */}}
+{{ $target := "es2015" }}
+{{ with .info.target }}
+  {{ $target = . }}
+{{ end }}
+
 {{/* Use can choose a format through script setting */}}
 {{ $format := "iife" }}
-{{ if .info.format }}
-  {{ $format = "cjs" }}
+{{ with .info.format }}
+  {{ if eq . "cjs" "esm" }}
+    {{ $format = . }}
+  {{ end }}
 {{ end }}
+
 
 {{/* We don't want to minify an inline script as function renaming might break script for functions
 invoked elsewhere  */}}
